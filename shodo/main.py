@@ -1,4 +1,5 @@
 import os.path
+import sys
 import time
 from pathlib import Path
 from urllib.parse import urlparse
@@ -6,11 +7,37 @@ from urllib.parse import urlparse
 import click
 
 from shodo.api import download_image, list_post_files
+from shodo.lint import Lint
 
 
 @click.group()
 def cli():
     ...
+
+
+@cli.command()
+@click.argument("filename")
+def lint(filename):
+    body = Path(filename).read_text(encoding="utf-8")
+    if not body:
+        return
+
+    linting = Lint.start(body)
+    for message in linting.results():
+        color = "\033[0;31m" if message.severity == message.ERROR else "\033[0;33m"
+        body_highlight = (
+            body[message.index-10:message.index] +
+            color +
+            body[message.index:message.index_to] +
+            (f"（→ {message.after}）" if message.after else "") +
+            "\033[0m" +
+            body[message.index_to:message.index_to+10]
+        ).replace("\n", " ")
+        print(message.from_, message.message)
+        print("    ", body_highlight)
+
+    if linting.messages:
+        sys.exit(1)
 
 
 @cli.command()

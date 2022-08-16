@@ -2,7 +2,7 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from .api import lint_create, lint_result
+from shodo.api import lint_create, lint_result
 
 
 @dataclass
@@ -52,7 +52,7 @@ class Lint:
 
     def results(self):
         while self.status == self.STATUS_PROCESSING:
-            time.sleep(.5)
+            time.sleep(0.5)
             self.status, messages = lint_result(self.lint_id)
             self.messages = [Message.load(m) for m in messages]
 

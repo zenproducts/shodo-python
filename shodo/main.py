@@ -34,12 +34,12 @@ def lint(filename):
     for message in linting.results():
         color = "\033[0;31m" if message.severity == message.ERROR else "\033[0;33m"
         body_highlight = (
-            body[message.index-10:message.index] +
-            color +
-            body[message.index:message.index_to] +
-            (f"（→ {message.after}）" if message.after else "") +
-            "\033[0m" +
-            body[message.index_to:message.index_to+10]
+            body[message.index - 10 : message.index]
+            + color
+            + body[message.index : message.index_to]
+            + (f"（→ {message.after}）" if message.after else "")
+            + "\033[0m"
+            + body[message.index_to : message.index_to + 10]
         ).replace("\n", " ")
         print(message.from_, message.message)
         print("    ", body_highlight)

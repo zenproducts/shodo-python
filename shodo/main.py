@@ -7,12 +7,20 @@ from urllib.parse import urlparse
 import click
 
 from shodo.api import download_image, list_post_files
+from shodo.conf import save_credentials
 from shodo.lint import Lint
 
 
 @click.group()
 def cli():
     ...
+
+
+@cli.command()
+def login():
+    root = input("APIルート: ")
+    token = input("APIトークン:")
+    save_credentials(root, token)
 
 
 @cli.command()

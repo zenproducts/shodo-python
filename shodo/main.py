@@ -7,12 +7,20 @@ from urllib.parse import urlparse
 import click
 
 from shodo.api import download_image, list_post_files
+from shodo.conf import save_credentials
 from shodo.lint import Lint
 
 
 @click.group()
 def cli():
     ...
+
+
+@cli.command()
+def login():
+    root = input("APIルート: ")
+    token = input("APIトークン:")
+    save_credentials(root, token)
 
 
 @cli.command()
@@ -27,13 +35,13 @@ def lint(filename):
     for message in linting.results():
         color = "red" if message.severity == message.ERROR else "yellow"
         body_highlight = (
-            body[message.index-10:message.index] +
-            click.style(
-                body[message.index:message.index_to] +
-                (f"（→ {message.after}）" if message.after else ""),
+            body[message.index - 10 : message.index]
+            + click.style(
+                body[message.index : message.index_to]
+                + (f"（→ {message.after}）" if message.after else ""),
                 color,
-            ) +
-            body[message.index_to:message.index_to+10]
+            )
+            + body[message.index_to : message.index_to + 10]
         ).replace("\n", " ")
         print(message.from_, message.message)
         print("    ", body_highlight)

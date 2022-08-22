@@ -54,7 +54,8 @@ class Lint:
         while self.status == self.STATUS_PROCESSING:
             time.sleep(.5)
             self.status, messages = lint_result(self.lint_id)
-            self.messages = [Message.load(m) for m in messages]
+            msgs = [Message.load(m) for m in messages]
+            self.messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
 
         if self.status == self.STATUS_FAILED:
             raise LintFailed

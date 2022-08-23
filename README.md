@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-$ pip3 install shodo
+pip3 install shodo
 ```
 
 ## Configuration
@@ -19,13 +19,13 @@ Lint Japanese.
 This command requires authentication (API root and a token) for Lint API projects (not for writing).
 
 ```bash
-$ shodo lint filename.md
+shodo lint filename.md
 ```
 
 ```bash
-$ shodo lint ./demo/demo.md                                                                                          15:18:27
+shodo lint ./demo/demo.md                                                                                          15:18:27
 18:4 ら抜き言葉です
-     てください。 すぐに食べれる（→ 食べられる）。 
+     てください。 すぐに食べれる（→ 食べられる）。
 ...
 3:11 もしかしてAI
      飛行機の欠便があり、運行（→ 運航）状況が変わった。 バ
@@ -40,7 +40,7 @@ $ shodo lint ./demo/demo.md                                                     
 Download all of Markdown posts and images!
 
 ```bash
-$ shodo download --target=docs
+shodo download --target=docs
 ```
 
 Options:

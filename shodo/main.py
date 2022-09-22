@@ -1,6 +1,7 @@
 import os.path
 import sys
 import time
+from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -19,7 +20,7 @@ def cli():
 @cli.command()
 def login():
     root = input("APIルート: ")
-    token = input("APIトークン:")
+    token = getpass("APIトークン:")
     save_credentials(root, token)
 
 

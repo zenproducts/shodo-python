@@ -4,25 +4,25 @@ from pathlib import Path
 
 SHODO_TOKEN = "SHODO_API_TOKEN"
 SHODO_ROOT = "SHODO_API_ROOT"
-CREDENTIALS_PATH = "~/.shodo/credentials"
+OLD_CREDENTIALS_PATH = "~/.shodo/credentials"
 
 
 def get_path():
-    return Path(CREDENTIALS_PATH).expanduser()
-
-
-def ensure_credentials():
-    c = get_path()
-    if not c.parent.exists():
-        c.parent.mkdir()
-    if not c.exists():
-        c.write_text("{}", encoding="utf-8")
+    config_path = Path(os.environ.get("XDG_CONFIG_HOME", "~/.config/"))
+    config_path = config_path.expanduser()
+    return config_path / "shodo/credentials"
 
 
 def save_credentials(root: str, token: str):
-    ensure_credentials()
     c = get_path()
-    d = json.loads(c.read_text(encoding="utf-8"))
+    if not c.parent.exists():
+        c.parent.mkdir()
+
+    if c.exists():
+        d = json.loads(c.read_text(encoding="utf-8"))
+    else:
+        d = {}
+
     d["default"] = {
         SHODO_ROOT: root,
         SHODO_TOKEN: token,
@@ -31,7 +31,13 @@ def save_credentials(root: str, token: str):
 
 
 def load_credentials():
-    d = json.loads(get_path().read_text(encoding="utf-8"))
+    p = get_path()
+    if not p.exists():
+        p = Path(OLD_CREDENTIALS_PATH).expanduser()
+        if not p.exists():
+            raise FileNotFoundError("Use 'shodo login' to save credentials before running")
+
+    d = json.loads(p.read_text(encoding="utf-8"))
     return d["default"]
 
 

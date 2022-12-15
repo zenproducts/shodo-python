@@ -25,8 +25,10 @@ class Message:
     to: Pos
     index: int
     index_to: int
+    score: float
     before: Optional[str] = None
     after: Optional[str] = None
+    operation: Optional[str] = None
 
     @classmethod
     def load(cls, data):

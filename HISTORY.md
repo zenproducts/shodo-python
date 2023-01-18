@@ -1,5 +1,9 @@
 # Release History
 
+## 0.0.8 (2023-01-18)
+
+Improved error message of removing words.
+
 ## 0.0.6 (2022-09-29)
 
 * Shodo respects `XDG_CONFIG_PATH` now.

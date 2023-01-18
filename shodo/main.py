@@ -39,7 +39,7 @@ def lint(filename):
             body[message.index - 10 : message.index]
             + click.style(
                 body[message.index : message.index_to]
-                + (f"（→ {message.after}）" if message.after else ""),
+                + (f"（→ {message.after or 'トル'}）" if message.after is not None else ""),
                 color,
             )
             + body[message.index_to : message.index_to + 10]

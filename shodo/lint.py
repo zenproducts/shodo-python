@@ -19,6 +19,7 @@ class Message:
     ERROR = "error"
     WARNING = "warning"
 
+    code: str
     message: str
     severity: str
     from_: Pos

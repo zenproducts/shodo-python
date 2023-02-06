@@ -1,5 +1,9 @@
 # Release History
 
+## 0.0.9 (2023-02-06)
+
+Added code params
+
 ## 0.0.8 (2023-01-18)
 
 Improved error message of removing words.

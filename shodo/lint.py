@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, Optional
 
 from shodo.api import lint_create, lint_result
 
@@ -30,6 +30,7 @@ class Message:
     before: Optional[str] = None
     after: Optional[str] = None
     operation: Optional[str] = None
+    meta: Optional[Dict] = None
 
     @classmethod
     def load(cls, data):

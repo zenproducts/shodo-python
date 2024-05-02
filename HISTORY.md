@@ -1,5 +1,9 @@
 # Release History
 
+### 0.0.10 (2024-05-02)
+
+Fixed TypeError when API will return 'meta' field on lint messages.
+
 ## 0.0.9 (2023-02-06)
 
 Added code params

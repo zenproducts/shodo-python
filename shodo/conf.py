@@ -35,7 +35,9 @@ def load_credentials():
     if not p.exists():
         p = Path(OLD_CREDENTIALS_PATH).expanduser()
         if not p.exists():
-            raise FileNotFoundError("Use 'shodo login' to save credentials before running")
+            raise FileNotFoundError(
+                "Use 'shodo login' to save credentials before running"
+            )
 
     d = json.loads(p.read_text(encoding="utf-8"))
     return d["default"]

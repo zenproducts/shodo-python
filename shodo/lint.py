@@ -1,5 +1,5 @@
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Dict, Optional
 
 from shodo.api import lint_create, lint_result
@@ -12,6 +12,9 @@ class Pos:
 
     def __str__(self):
         return f"{self.line+1}:{self.ch+1}"
+
+    def astuple(self):
+        return self.line, self.ch
 
 
 @dataclass
@@ -37,6 +40,13 @@ class Message:
         data["from_"] = Pos(**data.pop("from"))
         data["to"] = Pos(**data.pop("to"))
         return cls(**data)
+
+    def asdict(self):
+        data = asdict(self)
+        del data["from_"]
+        data["from"] = self.from_.astuple()
+        data["to"] = self.to.astuple()
+        return data
 
 
 class LintFailed(Exception):
@@ -70,6 +80,6 @@ class Lint:
         return f"Lint({self.lint_id})"
 
     @classmethod
-    def start(cls, body):
-        lint_id = lint_create(body)
+    def start(cls, body, is_html=False):
+        lint_id = lint_create(body, is_html)
         return cls(body, lint_id)

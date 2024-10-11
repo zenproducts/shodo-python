@@ -15,8 +15,12 @@ def shodo_auth(r):
     return r
 
 
-def lint_create(body: str) -> str:
-    res = requests.post(api_path("lint/"), json={"body": body}, auth=shodo_auth)
+def lint_create(body: str, is_html=False) -> str:
+    res = requests.post(
+        api_path("lint/"),
+        json={"body": body, "type": "html" if is_html else "text"},
+        auth=shodo_auth,
+    )
     res.raise_for_status()
     return res.json()["lint_id"]
 

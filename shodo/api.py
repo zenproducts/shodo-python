@@ -1,32 +1,35 @@
 import time
 from pathlib import Path
+from typing import Optional
 
 import requests
 
 from shodo import conf
 
 
-def api_path(path):
-    return conf()["API_ROOT"].rstrip("/") + "/" + path.strip("/") + "/"
+def api_path(path, profile):
+    return conf(profile)["API_ROOT"].rstrip("/") + "/" + path.strip("/") + "/"
 
 
-def shodo_auth(r):
-    r.headers["Authorization"] = "Bearer " + conf()["API_TOKEN"]
+def shodo_auth(r, profile: Optional[str] = None):
+    r.headers["Authorization"] = "Bearer " + conf(profile)["API_TOKEN"]
     return r
 
 
-def lint_create(body: str, is_html=False) -> str:
+def lint_create(body: str, is_html: bool = False, profile: Optional[str] = None) -> str:
     res = requests.post(
-        api_path("lint/"),
+        api_path("lint/", profile),
         json={"body": body, "type": "html" if is_html else "text"},
-        auth=shodo_auth,
+        auth=lambda r: shodo_auth(r, profile),
     )
     res.raise_for_status()
     return res.json()["lint_id"]
 
 
-def lint_result(lint_id: str) -> (str, list):
-    res = requests.get(api_path(f"lint/{lint_id}/"), auth=shodo_auth)
+def lint_result(lint_id: str, profile: Optional[str] = None) -> (str, list):
+    res = requests.get(
+        api_path(f"lint/{lint_id}/", profile), auth=lambda r: shodo_auth(r, profile)
+    )
     res.raise_for_status()
     data = res.json()
     return data["status"], data["messages"]
@@ -38,7 +41,7 @@ def download_image(image_url: str, image_path: Path):
     image_path.write_bytes(res.content)
 
 
-def list_post_files(in_tree=False):
+def list_post_files(in_tree=False, profile: Optional[str] = None):
     page = 1
     params = {}
     if in_tree:
@@ -46,8 +49,8 @@ def list_post_files(in_tree=False):
 
     while True:
         res = requests.get(
-            api_path("files/"),
-            auth=shodo_auth,
+            api_path("files/", profile),
+            auth=lambda r: shodo_auth(r, profile),
             params={
                 "page": page,
                 **params,

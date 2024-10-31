@@ -57,17 +57,18 @@ class Lint:
     STATUS_PROCESSING = "processing"
     STATUS_FAILED = "failed"
 
-    def __init__(self, body, lint_id):
+    def __init__(self, body, lint_id, profile):
         self.body = body
         self.lint_id = lint_id
         self.body = None
         self.status = self.STATUS_PROCESSING
         self.messages = []
+        self.profile = profile
 
     def results(self):
         while self.status == self.STATUS_PROCESSING:
             time.sleep(0.5)
-            self.status, messages = lint_result(self.lint_id)
+            self.status, messages = lint_result(self.lint_id, self.profile)
             msgs = [Message.load(m) for m in messages]
             self.messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
 
@@ -80,6 +81,6 @@ class Lint:
         return f"Lint({self.lint_id})"
 
     @classmethod
-    def start(cls, body, is_html=False):
-        lint_id = lint_create(body, is_html)
-        return cls(body, lint_id)
+    def start(cls, body: str, is_html: bool = False, profile: Optional[str] = None):
+        lint_id = lint_create(body, is_html, profile)
+        return cls(body, lint_id, profile)

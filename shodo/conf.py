@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Optional
 
 SHODO_TOKEN = "SHODO_API_TOKEN"
 SHODO_ROOT = "SHODO_API_ROOT"
@@ -13,7 +14,7 @@ def get_path():
     return config_path / "shodo/credentials"
 
 
-def save_credentials(root: str, token: str):
+def save_credentials(root: str, token: str, profile: str):
     c = get_path()
     if not c.parent.exists():
         c.parent.mkdir()
@@ -23,14 +24,14 @@ def save_credentials(root: str, token: str):
     else:
         d = {}
 
-    d["default"] = {
+    d[profile] = {
         SHODO_ROOT: root,
         SHODO_TOKEN: token,
     }
     c.write_text(json.dumps(d, indent=2), encoding="utf-8")
 
 
-def load_credentials():
+def load_credentials(profile: Optional[str] = None):
     p = get_path()
     if not p.exists():
         p = Path(OLD_CREDENTIALS_PATH).expanduser()
@@ -40,14 +41,14 @@ def load_credentials():
             )
 
     d = json.loads(p.read_text(encoding="utf-8"))
-    return d["default"]
+    return d[profile]
 
 
-def conf():
-    if SHODO_TOKEN in os.environ and SHODO_ROOT in os.environ:
+def conf(profile: Optional[str] = None):
+    if not profile and SHODO_TOKEN in os.environ and SHODO_ROOT in os.environ:
         c = os.environ
     else:
-        c = load_credentials()
+        c = load_credentials(profile)
     return {
         "API_ROOT": c[SHODO_ROOT],
         "API_TOKEN": c[SHODO_TOKEN],

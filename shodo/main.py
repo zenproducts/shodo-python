@@ -58,6 +58,8 @@ def lint(filename, html, output):
         return
 
     for message in linting.results():
+        if message.score < 0.5:
+            continue
         color = "red" if message.severity == message.ERROR else "yellow"
         body_highlight = (
             body[message.index - 10 : message.index]

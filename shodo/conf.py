@@ -8,6 +8,11 @@ SHODO_ROOT = "SHODO_API_ROOT"
 OLD_CREDENTIALS_PATH = "~/.shodo/credentials"
 
 
+class UnableLocateCredentialsError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
 def get_path():
     config_path = Path(os.environ.get("XDG_CONFIG_HOME", "~/.config/"))
     config_path = config_path.expanduser()
@@ -36,12 +41,20 @@ def load_credentials(profile: Optional[str] = None):
     if not p.exists():
         p = Path(OLD_CREDENTIALS_PATH).expanduser()
         if not p.exists():
-            raise FileNotFoundError(
+            raise UnableLocateCredentialsError(
                 "Use 'shodo login' to save credentials before running"
             )
 
     d = json.loads(p.read_text(encoding="utf-8"))
-    return d[profile]
+    c = d.get(profile)
+    if c is None:
+        msg = (
+            f"The config profile ({profile}) could not be found."
+            if profile is not None
+            else "Use 'shodo login' to save credentials before running"
+        )
+        raise UnableLocateCredentialsError(msg)
+    return c
 
 
 def conf(profile: Optional[str] = None):

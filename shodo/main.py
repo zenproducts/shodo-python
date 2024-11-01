@@ -9,11 +9,20 @@ from urllib.parse import urlparse
 import click
 
 from shodo.api import download_image, list_post_files
-from shodo.conf import save_credentials
+from shodo.conf import UnableLocateCredentialsError, save_credentials
 from shodo.lint import Lint
 
 
-@click.group()
+class ClickCatchExceptions(click.Group):
+    def __call__(self, *args, **kwargs):
+        try:
+            self.main(*args, **kwargs)
+        except UnableLocateCredentialsError as e:
+            click.echo(e.msg)
+            sys.exit(255)
+
+
+@click.group(cls=ClickCatchExceptions)
 def cli():
     ...
 
@@ -37,7 +46,7 @@ def login(profile):
 @click.option(
     "--profile",
     help="Use a specific profile from your credential file.",
-    default="default",
+    default=None,
 )
 def lint(filename, html, output, profile):
     if filename is None:
@@ -95,7 +104,7 @@ def lint(filename, html, output, profile):
 @click.option(
     "--profile",
     help="Use a specific profile from your credential file.",
-    default="default",
+    default=None,
 )
 def download(target, in_tree, profile):
     base_dir = Path() / target

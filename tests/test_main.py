@@ -126,14 +126,14 @@ class TestLint:
         m_lint = mocker.patch(
             "shodo.main.Lint.start",
             side_effect=UnableLocateCredentialsError(
-                "Use 'shodo login' to save credentials before running"
+                "Use 'shodo login' to save credentials before running."
             ),
         )
 
         actual = runner.invoke(cli, ["lint", str(filename)])
 
         assert actual.exit_code == 1
-        assert actual.exception.msg == "Use 'shodo login' to save credentials before running"
+        assert actual.exception.msg == "Use 'shodo login' to save credentials before running."
         assert m_lint.call_count == 1
         assert m_lint.call_args == ((body,), {"is_html": False, "profile": None})
 
@@ -196,14 +196,14 @@ class TestDownload:
         m_lint_post_files = mocker.patch(
             "shodo.main.list_post_files",
             side_effect=UnableLocateCredentialsError(
-                "Use 'shodo login' to save credentials before running"
+                "Use 'shodo login' to save credentials before running."
             ),
         )
 
         actual = runner.invoke(cli, ["download", "--target", str(tmp_path)])
 
         assert actual.exit_code == 1
-        assert actual.exception.msg == "Use 'shodo login' to save credentials before running"
+        assert actual.exception.msg == "Use 'shodo login' to save credentials before running."
         assert m_lint_post_files.call_count == 1
         assert m_lint_post_files.call_args == ((), {"in_tree": False, "profile": None})
 

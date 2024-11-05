@@ -42,7 +42,7 @@ class TestLoadCredentials:
         with pytest.raises(UnableLocateCredentialsError) as e:
             load_credentials(profile)
 
-        assert e.value.msg == "Use 'shodo login' to save credentials before running"
+        assert e.value.msg == "Use 'shodo login' to save credentials before running."
 
     @pytest.mark.parametrize("profile", ["default", "tests"], ids=["default", "tests"])
     def test_exist_credentials(self, credentials_path, api_root, profile):
@@ -58,7 +58,7 @@ class TestLoadCredentials:
     @pytest.mark.parametrize(
         "profile, expected",
         [
-            (None, "Use 'shodo login' to save credentials before running"),
+            (None, "Use 'shodo login' to save credentials before running."),
             ("default", "The config profile (default) could not be found."),
             ("tests", "The config profile (tests) could not be found."),
         ],
@@ -86,7 +86,7 @@ class TestConf:
         with pytest.raises(UnableLocateCredentialsError) as e:
             conf(None)
 
-        assert e.value.msg == "Use 'shodo login' to save credentials before running"
+        assert e.value.msg == "Use 'shodo login' to save credentials before running."
 
     def test_profile_is_none(self, credentials_path, shodo_envs, api_root):
         actual = conf(None)

@@ -1,0 +1,18 @@
+[tool.black]
+line-length = 99
+exclude = '''
+(
+    .mypy_cache
+    | .pytest_cache
+    | .tox
+    | venv
+    | .venv
+    | env
+)
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+line_length = 99
+src_paths = 'shodo, tests'

@@ -1,57 +1,32 @@
 # Shodo Python CLI
 
+The Shodo Python CLI help you, lint Japanese text and download posts and images.
+
 ## Installation
 
 ```bash
 $ pip3 install shodo
 ```
 
-## Configuration
-
-These environment variables are required
-
-* `SHODO_API_ROOT` Root endpoint for API (like `https://api.shodo.ink/@my-organization/my-project/`).
-* `SHODO_API_TOKEN` Token to access each projects (Access to Shodo and see projects' 「API連携」 settings page)
-
 ## Usage
 
-Lint Japanese.
-This command requires authentication (API root and a token) for Lint API projects (not for writing).
+Installing the CLI provides access to the `shodo` command.
 
 ```bash
-$ shodo lint filename.md
+$ shodo [COMMAND]
+
+# Run `--help` for more information about CLI commands
+$ shodo [COMMAND] --help
 ```
 
-```bash
-$ shodo lint ./demo/demo.md                                                                                          15:18:27
-18:4 ら抜き言葉です
-     てください。 すぐに食べれる（→ 食べられる）。 
-...
-3:11 もしかしてAI
-     飛行機の欠便があり、運行（→ 運航）状況が変わった。 バ
-6:5 もしかしてAI
-     ません。  これが私で（→ の）自己紹介です。  こ
-12:11 もしかしてAI
-     なんでも問題を解決しい（→ トル）ます。 日本語ののよ
-```
+## Commands
 
-### Download files
+The Shodo Python CLI provides the following commands:
 
-Download all of Markdown posts and images!
+* [`login`]()
+* [`lint`]()
+* [`download`]()
 
-```bash
-$ shodo download --target=docs
-```
+## Documentation
 
-Options:
-
-```
-Usage: shodo download [OPTIONS]
-
-  Download all of Markdown posts and images.
-
-Options:
-  --target DIRECTORY  Target directory to save files.
-  --in-tree           Download only files with task Folder.
-  --help              Show this message and exit.
-```
+For additional information, please refer to the [Shodo Python CLI documentation]().

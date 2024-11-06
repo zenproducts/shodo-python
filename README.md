@@ -48,8 +48,10 @@ Options:
 ```
 Usage: shodo download [OPTIONS]
 
+  Download all of Markdown posts and images.
+
 Options:
-  --target TEXT      Target directory to save files
-  --in-tree BOOLEAN  Download only files with task Folder
-  --help             Show this message and exit.
+  --target DIRECTORY  Target directory to save files.
+  --in-tree           Download only files with task Folder.
+  --help              Show this message and exit.
 ```

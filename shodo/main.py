@@ -14,21 +14,29 @@ from shodo.lint import Lint
 
 
 @click.group()
-def cli():
-    ...
+def cli(): ...
 
 
-@cli.command()
+@cli.command(help="Login to Shodo API.")
 def login():
     root = input("APIルート: ")
     token = getpass("APIトークン:")
     save_credentials(root, token)
 
 
-@cli.command()
-@click.argument("filename", required=False)
-@click.option("--html", default=False, is_flag=True)
-@click.option("--output", default=None)
+@cli.command(help="Lint Japanese text.")
+@click.argument(
+    "filename", required=False, type=click.Path(exists=True, dir_okay=False)
+)
+@click.option(
+    "--html", help="Specify if the input is HTML.", default=False, is_flag=True
+)
+@click.option(
+    "--output",
+    help="Output format.",
+    default="text",
+    type=click.Choice(["text", "json"]),
+)
 def lint(filename, html, output):
     if filename is None:
         contents = []
@@ -81,9 +89,19 @@ def lint(filename, html, output):
         sys.exit(1)
 
 
-@cli.command()
-@click.option("--target", help="Target directory to save files", default="docs")
-@click.option("--in-tree", help="Download only files with task Folder", default=False)
+@cli.command(help="Download all of Markdown posts and images.")
+@click.option(
+    "--target",
+    help="Target directory to save files.",
+    default="docs",
+    type=click.Path(file_okay=False, writable=True),
+)
+@click.option(
+    "--in-tree",
+    help="Download only files with task Folder.",
+    default=False,
+    is_flag=True,
+)
 def download(target, in_tree):
     base_dir = Path() / target
     for file in list_post_files(in_tree=in_tree):

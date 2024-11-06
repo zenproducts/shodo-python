@@ -20,6 +20,12 @@ setup(
         "Click",
         "requests",
     ],
+    extras_require={
+        "dev": [
+            "pytest",
+            "pytest-mock",
+        ],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",

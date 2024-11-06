@@ -9,19 +9,34 @@ from urllib.parse import urlparse
 import click
 
 from shodo.api import download_image, list_post_files
-from shodo.conf import save_credentials
+from shodo.conf import UnableLocateCredentialsError, save_credentials
 from shodo.lint import Lint
 
 
-@click.group()
-def cli(): ...
+class ClickCatchExceptions(click.Group):
+    def __call__(self, *args, **kwargs):
+        try:
+            self.main(*args, **kwargs)
+        except UnableLocateCredentialsError as e:
+            click.echo(e.msg)
+            sys.exit(255)
+
+
+@click.group(cls=ClickCatchExceptions)
+def cli():
+    ...
 
 
 @cli.command(help="Login to Shodo API.")
-def login():
+@click.option(
+    "--profile",
+    help="Save a specific profile to your credential file.",
+    default="default",
+)
+def login(profile):
     root = input("APIルート: ")
     token = getpass("APIトークン:")
-    save_credentials(root, token)
+    save_credentials(root, token, profile)
 
 
 @cli.command(help="Lint Japanese text.")
@@ -37,7 +52,12 @@ def login():
     default="text",
     type=click.Choice(["text", "json"]),
 )
-def lint(filename, html, output):
+@click.option(
+    "--profile",
+    help="Use a specific profile from your credential file.",
+    default=None,
+)
+def lint(filename, html, output, profile):
     if filename is None:
         contents = []
         while True:
@@ -52,7 +72,7 @@ def lint(filename, html, output):
     if not body:
         return
 
-    linting = Lint.start(body, is_html=html)
+    linting = Lint.start(body, is_html=html, profile=profile)
     print("Linting...")
 
     if output == "json":
@@ -102,9 +122,14 @@ def lint(filename, html, output):
     default=False,
     is_flag=True,
 )
-def download(target, in_tree):
+@click.option(
+    "--profile",
+    help="Use a specific profile from your credential file.",
+    default=None,
+)
+def download(target, in_tree, profile):
     base_dir = Path() / target
-    for file in list_post_files(in_tree=in_tree):
+    for file in list_post_files(in_tree=in_tree, profile=profile):
         dir_path = base_dir / (file["directory_path"] or "未分類")
         dir_path.mkdir(parents=True, exist_ok=True)
 

@@ -23,10 +23,10 @@ $ shodo [COMMAND] --help
 
 The Shodo Python CLI provides the following commands:
 
-* [`login`]()
-* [`lint`]()
-* [`download`]()
+* [`login`](https://developer.shodo.ink/docs/shodo-cli-reference#shodo-login)
+* [`lint`](https://developer.shodo.ink/docs/shodo-cli-reference#shodo-lint)
+* [`download`](https://developer.shodo.ink/docs/shodo-cli-reference#shodo-download)
 
 ## Documentation
 
-For additional information, please refer to the [Shodo Python CLI documentation]().
+For additional information, please refer to the [Shodo Python CLI documentation](https://developer.shodo.ink/docs/shodo-cli-reference).

@@ -44,8 +44,18 @@ class TestLoadCredentials:
 
         assert e.value.msg == "Use 'shodo login' to save credentials before running."
 
+    def test_exist_credentials_without_profile(self, credentials_path, api_root):
+        save_credentials(f"{api_root}default/", "stub-token", "default")
+
+        actual = load_credentials(None)
+
+        assert actual == {
+            "SHODO_API_ROOT": f"{api_root}default/",
+            "SHODO_API_TOKEN": "stub-token",
+        }
+
     @pytest.mark.parametrize("profile", ["default", "tests"], ids=["default", "tests"])
-    def test_exist_credentials(self, credentials_path, api_root, profile):
+    def test_exist_credentials_with_profile(self, credentials_path, api_root, profile):
         save_credentials(f"{api_root}{profile}/", "stub-token", profile)
 
         actual = load_credentials(profile)

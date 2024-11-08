@@ -46,7 +46,7 @@ def load_credentials(profile: Optional[str] = None):
             )
 
     d = json.loads(p.read_text(encoding="utf-8"))
-    c = d.get(profile)
+    c = d.get(profile or "default")
     if c is None:
         msg = (
             f"The config profile ({profile}) could not be found."

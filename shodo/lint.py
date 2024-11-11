@@ -13,8 +13,11 @@ class Pos:
     def __str__(self):
         return f"{self.line+1}:{self.ch+1}"
 
-    def astuple(self):
-        return self.line, self.ch
+    def asdict(self):
+        return {
+            "line": self.line,
+            "ch": self.ch,
+        }
 
 
 @dataclass
@@ -44,8 +47,8 @@ class Message:
     def asdict(self):
         data = asdict(self)
         del data["from_"]
-        data["from"] = self.from_.astuple()
-        data["to"] = self.to.astuple()
+        data["from"] = self.from_.asdict()
+        data["to"] = self.to.asdict()
         return data
 
 

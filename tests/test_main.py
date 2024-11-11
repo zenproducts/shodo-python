@@ -1,5 +1,4 @@
 import uuid
-from os import access
 from pathlib import Path
 
 import pytest
@@ -97,7 +96,7 @@ class TestLint:
         ]
         mocker.patch.object(Lint, "results", return_value=stub_results)
 
-        actual = runner.invoke(cli, ["lint", str(filename)])
+        actual = runner.invoke(cli, args=["lint", str(filename)], color=True)
 
         assert actual.exit_code == 0
         assert (

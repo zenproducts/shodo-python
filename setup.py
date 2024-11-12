@@ -8,7 +8,7 @@ README = open(os.path.join(here, "README.md")).read()
 
 setup(
     name="shodo",
-    version="1.0.0",
+    version="1.0.1",
     packages=find_packages(),
     url="https://github.com/zenproducts/shodo-python",
     license="MIT",

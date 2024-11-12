@@ -5,7 +5,7 @@ The Shodo Python CLI help you, lint Japanese text and download posts and images.
 ## Installation
 
 ```bash
-$ pip3 install shodo
+$ pip install shodo
 ```
 
 ## Usage

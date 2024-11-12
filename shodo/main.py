@@ -73,10 +73,10 @@ def lint(filename, html, output, profile):
         return
 
     linting = Lint.start(body, is_html=html, profile=profile)
-    print("Linting...")
+    click.echo("Linting...", err=True)
 
     if output == "json":
-        print(
+        click.echo(
             json.dumps(
                 [msg.asdict() for msg in linting.results()],
                 ensure_ascii=False,
@@ -102,8 +102,12 @@ def lint(filename, html, output, profile):
             )
             + body[message.index_to : message.index_to + 10]
         ).replace("\n", " ")
-        print(message.from_, message.message)
-        print("    ", body_highlight)
+
+        click.echo(message.from_, nl=False)
+        click.echo(" ", nl=False)
+        click.echo(message.message)
+        click.echo("     ", nl=False)
+        click.echo(body_highlight)
 
     if linting.messages:
         sys.exit(1)

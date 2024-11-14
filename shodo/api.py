@@ -71,7 +71,7 @@ def list_post_files(
     in_tree=False, profile: Optional[str] = None
 ) -> Generator[Dict[str, Any], None, None]:
     page = 1
-    params: Dict[str, Any] = {"page": page}
+    params: Dict[str, Any] = {}
     if in_tree:
         params["in_tree"] = "1"
 
@@ -79,7 +79,10 @@ def list_post_files(
         res = requests.get(
             api_path("files/", profile),
             auth=lambda r: shodo_auth(r, profile),
-            params=params,
+            params={
+                "page": page,
+                **params,
+            },
         )
         res.raise_for_status()
         data = res.json()

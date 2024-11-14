@@ -41,4 +41,9 @@ setup(
             "shodo = shodo.main:cli",
         ],
     },
+    package_data={
+        "shodo": [
+            "py.typed",
+        ],
+    },
 )

@@ -1,5 +1,5 @@
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional
@@ -33,7 +33,7 @@ class LintCreateResponse:
 class LintResultResponse:
     status: str
     messages: List[Dict[str, Any]]
-    updated: datetime = field(default_factory=lambda: datetime.now())
+    updated: datetime
 
     def __post_init__(self) -> None:
         if isinstance(self.updated, int):

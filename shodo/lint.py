@@ -98,7 +98,7 @@ class Lint:
         return cls(body, res.lint_id, profile)
 
 
-def lint(body: str, is_html: bool, profile: Optional[str] = None) -> LintResult:
+def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
     create_res = lint_create(body, is_html, profile)
 
     status = Lint.STATUS_PROCESSING

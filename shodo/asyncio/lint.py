@@ -7,7 +7,7 @@ from shodo.asyncio.api import lint_create, lint_result
 from shodo.lint import Lint, LintFailed, LintResult, Message
 
 
-async def lint(body: str, is_html: bool, profile: Optional[str] = None) -> LintResult:
+async def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
     async with aiohttp.ClientSession() as session:
         create_res = await lint_create(body, is_html, profile, session)
 

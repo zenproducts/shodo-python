@@ -2,18 +2,20 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generator, List, Optional
 
 import requests
 
-from shodo import conf
+from shodo.conf import conf
 
 
-def api_path(path, profile):
+def api_path(path, profile) -> str:
     return conf(profile).api_root.rstrip("/") + "/" + path.strip("/") + "/"
 
 
-def shodo_auth(r, profile: Optional[str] = None):
+def shodo_auth(
+    r: requests.PreparedRequest, profile: Optional[str] = None
+) -> requests.PreparedRequest:
     r.headers["Authorization"] = "Bearer " + conf(profile).api_token
     return r
 
@@ -59,15 +61,17 @@ def lint_result(lint_id: str, profile: Optional[str] = None) -> LintResultRespon
     return LintResultResponse(**data)
 
 
-def download_image(image_url: str, image_path: Path):
+def download_image(image_url: str, image_path: Path) -> None:
     res = requests.get(image_url)
     res.raise_for_status()
     image_path.write_bytes(res.content)
 
 
-def list_post_files(in_tree=False, profile: Optional[str] = None):
+def list_post_files(
+    in_tree=False, profile: Optional[str] = None
+) -> Generator[Dict[str, Any], None, None]:
     page = 1
-    params = {}
+    params: Dict[str, Any] = {"page": page}
     if in_tree:
         params["in_tree"] = "1"
 
@@ -75,10 +79,7 @@ def list_post_files(in_tree=False, profile: Optional[str] = None):
         res = requests.get(
             api_path("files/", profile),
             auth=lambda r: shodo_auth(r, profile),
-            params={
-                "page": page,
-                **params,
-            },
+            params=params,
         )
         res.raise_for_status()
         data = res.json()

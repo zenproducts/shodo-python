@@ -27,6 +27,8 @@ setup(
         "dev": [
             "pytest",
             "pytest-mock",
+            "mypy",
+            "types-requests",
         ],
     },
     classifiers=[

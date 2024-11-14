@@ -40,8 +40,12 @@ def login(profile):
 
 
 @cli.command(help="Lint Japanese text.")
-@click.argument("filename", required=False, type=click.Path(exists=True, dir_okay=False))
-@click.option("--html", help="Specify if the input is HTML.", default=False, is_flag=True)
+@click.argument(
+    "filename", required=False, type=click.Path(exists=True, dir_okay=False)
+)
+@click.option(
+    "--html", help="Specify if the input is HTML.", default=False, is_flag=True
+)
 @click.option(
     "--output",
     help="Output format.",
@@ -89,7 +93,11 @@ def lint(filename, html, output, profile):
             body[message.index - 10 : message.index]
             + click.style(
                 body[message.index : message.index_to]
-                + (f"（→ {message.after or 'トル'}）" if message.after is not None else ""),
+                + (
+                    f"（→ {message.after or 'トル'}）"
+                    if message.after is not None
+                    else ""
+                ),
                 color,
             )
             + body[message.index_to : message.index_to + 10]

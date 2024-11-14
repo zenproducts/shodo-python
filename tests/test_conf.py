@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Generator
 
 import pytest
 
@@ -14,7 +15,7 @@ from shodo.conf import (
 
 
 @pytest.fixture
-def credentials_path(tmp_path) -> Path:
+def credentials_path(tmp_path) -> Generator[Path, None, None]:
     os.environ["XDG_CONFIG_HOME"] = str(tmp_path)
     yield tmp_path / "shodo" / "credentials"
     del os.environ["XDG_CONFIG_HOME"]

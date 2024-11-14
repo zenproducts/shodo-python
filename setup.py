@@ -21,6 +21,9 @@ setup(
         "requests",
     ],
     extras_require={
+        "async": [
+            "aiohttp",
+        ],
         "dev": [
             "pytest",
             "pytest-mock",

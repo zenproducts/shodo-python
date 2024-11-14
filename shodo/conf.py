@@ -1,11 +1,18 @@
 import json
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 SHODO_TOKEN = "SHODO_API_TOKEN"
 SHODO_ROOT = "SHODO_API_ROOT"
 OLD_CREDENTIALS_PATH = "~/.shodo/credentials"
+
+
+@dataclass(frozen=True)
+class Credential:
+    api_root: str
+    api_token: str
 
 
 class UnableLocateCredentialsError(Exception):
@@ -57,12 +64,9 @@ def load_credentials(profile: Optional[str] = None):
     return c
 
 
-def conf(profile: Optional[str] = None):
+def conf(profile: Optional[str] = None) -> Credential:
     if not profile and SHODO_TOKEN in os.environ and SHODO_ROOT in os.environ:
         c = os.environ
     else:
         c = load_credentials(profile)
-    return {
-        "API_ROOT": c[SHODO_ROOT],
-        "API_TOKEN": c[SHODO_TOKEN],
-    }
+    return Credential(api_root=c[SHODO_ROOT], api_token=c[SHODO_TOKEN])

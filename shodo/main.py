@@ -10,7 +10,7 @@ import click
 
 from shodo.api import download_image, list_post_files
 from shodo.conf import UnableLocateCredentialsError, save_credentials
-from shodo.lint import Lint
+from shodo.lint import lint as shodo_lint
 
 
 class ClickCatchExceptions(click.Group):
@@ -72,20 +72,20 @@ def lint(filename, html, output, profile):
     if not body:
         return
 
-    linting = Lint.start(body, is_html=html, profile=profile)
     click.echo("Linting...", err=True)
+    result = shodo_lint(body, is_html=html, profile=profile)
 
     if output == "json":
         click.echo(
             json.dumps(
-                [msg.asdict() for msg in linting.results()],
+                [msg.asdict() for msg in result.messages],
                 ensure_ascii=False,
                 indent=2,
             )
         )
         return
 
-    for message in linting.results():
+    for message in result.messages:
         if message.score < 0.5:
             continue
         color = "red" if message.severity == message.ERROR else "yellow"
@@ -93,11 +93,7 @@ def lint(filename, html, output, profile):
             body[message.index - 10 : message.index]
             + click.style(
                 body[message.index : message.index_to]
-                + (
-                    f"（→ {message.after or 'トル'}）"
-                    if message.after is not None
-                    else ""
-                ),
+                + (f"（→ {message.after or 'トル'}）" if message.after is not None else ""),
                 color,
             )
             + body[message.index_to : message.index_to + 10]
@@ -109,7 +105,7 @@ def lint(filename, html, output, profile):
         click.echo("     ", nl=False)
         click.echo(body_highlight)
 
-    if linting.messages:
+    if result.messages:
         sys.exit(1)
 
 

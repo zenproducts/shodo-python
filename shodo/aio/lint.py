@@ -11,9 +11,9 @@ async def lint(body: str, is_html: bool = False, profile: Optional[str] = None) 
     async with aiohttp.ClientSession() as session:
         create_res = await lint_create(body, is_html, profile, session)
 
-        status = Lint.STATUS_PROCESSING
+        status = Lint.STATUS_PROCESSING.value
         pause = 0.25
-        while status == Lint.STATUS_PROCESSING:
+        while status == Lint.STATUS_PROCESSING.value:
             await asyncio.sleep(pause)
             result_res = await lint_result(create_res.lint_id, profile, session)
             status = result_res.status
@@ -23,7 +23,7 @@ async def lint(body: str, is_html: bool = False, profile: Optional[str] = None) 
             if pause < 16:
                 pause *= 2
 
-        if status == Lint.STATUS_FAILED:
+        if status == Lint.STATUS_FAILED.value:
             raise LintFailed
 
         return LintResult(status=status, messages=messages, updated=result_res.updated)

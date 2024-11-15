@@ -1,4 +1,5 @@
 import time
+from enum import Enum
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -64,46 +65,17 @@ class LintFailed(Exception):
     pass
 
 
-class Lint:
+class Lint(Enum):
     STATUS_PROCESSING = "processing"
     STATUS_FAILED = "failed"
-
-    def __init__(self, body, lint_id, profile):
-        self.body = body
-        self.lint_id = lint_id
-        self.body = None
-        self.status = self.STATUS_PROCESSING
-        self.messages = []
-        self.profile = profile
-
-    def results(self):
-        while self.status == self.STATUS_PROCESSING:
-            time.sleep(0.5)
-            res = lint_result(self.lint_id, self.profile)
-            self.status = res.status
-            msgs = [Message.load(m) for m in res.messages]
-            self.messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
-
-        if self.status == self.STATUS_FAILED:
-            raise LintFailed
-
-        return self.messages
-
-    def __repr__(self):
-        return f"Lint({self.lint_id})"
-
-    @classmethod
-    def start(cls, body: str, is_html: bool = False, profile: Optional[str] = None):
-        res = lint_create(body, is_html, profile)
-        return cls(body, res.lint_id, profile)
 
 
 def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
     create_res = lint_create(body, is_html, profile)
 
-    status = Lint.STATUS_PROCESSING
+    status = Lint.STATUS_PROCESSING.value
     pause = 0.25
-    while status == Lint.STATUS_PROCESSING:
+    while status == Lint.STATUS_PROCESSING.value:
         time.sleep(pause)
         result_res = lint_result(create_res.lint_id, profile)
         status = result_res.status
@@ -113,7 +85,7 @@ def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> Lin
         if pause < 16:
             pause *= 2
 
-    if status == Lint.STATUS_FAILED:
+    if status == Lint.STATUS_FAILED.value:
         raise LintFailed
 
     return LintResult(status=status, messages=messages, updated=result_res.updated)

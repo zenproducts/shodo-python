@@ -65,17 +65,18 @@ class LintFailed(Exception):
     pass
 
 
-class Lint(Enum):
-    STATUS_PROCESSING = "processing"
-    STATUS_FAILED = "failed"
+class LintStatus(Enum):
+    PROCESSING = "processing"
+    FAILED = "failed"
+    DONE = "done"
 
 
 def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
     create_res = lint_create(body, is_html, profile)
 
-    status = Lint.STATUS_PROCESSING.value
+    status = LintStatus.PROCESSING.value
     pause = 0.25
-    while status == Lint.STATUS_PROCESSING.value:
+    while status == LintStatus.PROCESSING:
         time.sleep(pause)
         result_res = lint_result(create_res.lint_id, profile)
         status = result_res.status
@@ -85,7 +86,7 @@ def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> Lin
         if pause < 16:
             pause *= 2
 
-    if status == Lint.STATUS_FAILED.value:
+    if status == LintStatus.FAILED:
         raise LintFailed
 
     return LintResult(status=status, messages=messages, updated=result_res.updated)

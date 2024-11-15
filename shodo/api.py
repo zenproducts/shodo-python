@@ -1,49 +1,77 @@
 import time
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Generator, List, Optional
 
 import requests
 
-from shodo import conf
+from shodo.conf import conf
 
 
-def api_path(path, profile):
-    return conf(profile)["API_ROOT"].rstrip("/") + "/" + path.strip("/") + "/"
+def api_path(path, profile) -> str:
+    return conf(profile).api_root.rstrip("/") + "/" + path.strip("/") + "/"
 
 
-def shodo_auth(r, profile: Optional[str] = None):
-    r.headers["Authorization"] = "Bearer " + conf(profile)["API_TOKEN"]
+def shodo_auth(
+    r: requests.PreparedRequest, profile: Optional[str] = None
+) -> requests.PreparedRequest:
+    r.headers["Authorization"] = "Bearer " + conf(profile).api_token
     return r
 
 
-def lint_create(body: str, is_html: bool = False, profile: Optional[str] = None) -> str:
+@dataclass(frozen=True)
+class LintCreateResponse:
+    lint_id: str
+    monthly_amount: int
+    current_usage: int
+    len_body: int
+    len_used: int
+
+
+@dataclass
+class LintResultResponse:
+    status: str
+    messages: List[Dict[str, Any]]
+    updated: datetime
+
+    def __post_init__(self) -> None:
+        if isinstance(self.updated, int):
+            self.updated = datetime.fromtimestamp(self.updated)
+
+
+def lint_create(
+    body: str, is_html: bool = False, profile: Optional[str] = None
+) -> LintCreateResponse:
     res = requests.post(
         api_path("lint/", profile),
         json={"body": body, "type": "html" if is_html else "text"},
         auth=lambda r: shodo_auth(r, profile),
     )
     res.raise_for_status()
-    return res.json()["lint_id"]
+    return LintCreateResponse(**res.json())
 
 
-def lint_result(lint_id: str, profile: Optional[str] = None) -> (str, list):
+def lint_result(lint_id: str, profile: Optional[str] = None) -> LintResultResponse:
     res = requests.get(
         api_path(f"lint/{lint_id}/", profile), auth=lambda r: shodo_auth(r, profile)
     )
     res.raise_for_status()
     data = res.json()
-    return data["status"], data["messages"]
+    return LintResultResponse(**data)
 
 
-def download_image(image_url: str, image_path: Path):
+def download_image(image_url: str, image_path: Path) -> None:
     res = requests.get(image_url)
     res.raise_for_status()
     image_path.write_bytes(res.content)
 
 
-def list_post_files(in_tree=False, profile: Optional[str] = None):
+def list_post_files(
+    in_tree=False, profile: Optional[str] = None
+) -> Generator[Dict[str, Any], None, None]:
     page = 1
-    params = {}
+    params: Dict[str, Any] = {}
     if in_tree:
         params["in_tree"] = "1"
 

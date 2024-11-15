@@ -1,14 +1,21 @@
 import json
 import os
 from pathlib import Path
+from typing import Generator
 
 import pytest
 
-from shodo.conf import UnableLocateCredentialsError, conf, load_credentials, save_credentials
+from shodo.conf import (
+    Credential,
+    UnableLocateCredentialsError,
+    conf,
+    load_credentials,
+    save_credentials,
+)
 
 
 @pytest.fixture
-def credentials_path(tmp_path) -> Path:
+def credentials_path(tmp_path) -> Generator[Path, None, None]:
     os.environ["XDG_CONFIG_HOME"] = str(tmp_path)
     yield tmp_path / "shodo" / "credentials"
     del os.environ["XDG_CONFIG_HOME"]
@@ -101,10 +108,7 @@ class TestConf:
     def test_profile_is_none(self, credentials_path, shodo_envs, api_root):
         actual = conf(None)
 
-        assert actual == {
-            "API_ROOT": f"{api_root}default/",
-            "API_TOKEN": "stub-token",
-        }
+        assert actual == Credential(api_root=f"{api_root}default/", api_token="stub-token")
 
     @pytest.mark.parametrize("profile", ["default", "tests"], ids=["default", "tests"])
     def test_envs_is_none(self, credentials_path, api_root, profile):
@@ -112,17 +116,11 @@ class TestConf:
 
         actual = conf(profile)
 
-        assert actual == {
-            "API_ROOT": f"{api_root}{profile}/",
-            "API_TOKEN": "stub-token",
-        }
+        assert actual == Credential(api_root=f"{api_root}{profile}/", api_token="stub-token")
 
     def test_profile_and_envs_is_not_none(self, credentials_path, shodo_envs, api_root):
         save_credentials(f"{api_root}default/", "stub-token", "default")
 
         actual = conf("default")
 
-        assert actual == {
-            "API_ROOT": f"{api_root}default/",
-            "API_TOKEN": "stub-token",
-        }
+        assert actual == Credential(api_root=f"{api_root}default/", api_token="stub-token")

@@ -21,9 +21,14 @@ setup(
         "requests",
     ],
     extras_require={
+        "async": [
+            "aiohttp",
+        ],
         "dev": [
             "pytest",
             "pytest-mock",
+            "mypy",
+            "types-requests",
         ],
     },
     classifiers=[
@@ -34,6 +39,11 @@ setup(
     entry_points={
         "console_scripts": [
             "shodo = shodo.main:cli",
+        ],
+    },
+    package_data={
+        "shodo": [
+            "py.typed",
         ],
     },
 )

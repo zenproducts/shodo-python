@@ -1,6 +1,7 @@
 import time
 from dataclasses import asdict, dataclass
-from typing import Dict, Optional
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from shodo.api import lint_create, lint_result
 
@@ -39,7 +40,7 @@ class Message:
     meta: Optional[Dict] = None
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data: Dict[str, Any]):
         data["from_"] = Pos(**data.pop("from"))
         data["to"] = Pos(**data.pop("to"))
         return cls(**data)
@@ -50,6 +51,13 @@ class Message:
         data["from"] = self.from_.asdict()
         data["to"] = self.to.asdict()
         return data
+
+
+@dataclass(frozen=True)
+class LintResult:
+    status: str
+    messages: List[Message]
+    updated: datetime
 
 
 class LintFailed(Exception):
@@ -71,8 +79,9 @@ class Lint:
     def results(self):
         while self.status == self.STATUS_PROCESSING:
             time.sleep(0.5)
-            self.status, messages = lint_result(self.lint_id, self.profile)
-            msgs = [Message.load(m) for m in messages]
+            res = lint_result(self.lint_id, self.profile)
+            self.status = res.status
+            msgs = [Message.load(m) for m in res.messages]
             self.messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
 
         if self.status == self.STATUS_FAILED:
@@ -85,5 +94,26 @@ class Lint:
 
     @classmethod
     def start(cls, body: str, is_html: bool = False, profile: Optional[str] = None):
-        lint_id = lint_create(body, is_html, profile)
-        return cls(body, lint_id, profile)
+        res = lint_create(body, is_html, profile)
+        return cls(body, res.lint_id, profile)
+
+
+def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
+    create_res = lint_create(body, is_html, profile)
+
+    status = Lint.STATUS_PROCESSING
+    pause = 0.25
+    while status == Lint.STATUS_PROCESSING:
+        time.sleep(pause)
+        result_res = lint_result(create_res.lint_id, profile)
+        status = result_res.status
+
+        msgs = [Message.load(m) for m in result_res.messages]
+        messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
+        if pause < 16:
+            pause *= 2
+
+    if status == Lint.STATUS_FAILED:
+        raise LintFailed
+
+    return LintResult(status=status, messages=messages, updated=result_res.updated)

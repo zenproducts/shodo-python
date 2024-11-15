@@ -3,7 +3,7 @@ from typing import Optional
 
 import aiohttp
 
-from shodo.asyncio.api import lint_create, lint_result
+from shodo.aio.api import lint_create, lint_result
 from shodo.lint import Lint, LintFailed, LintResult, Message
 
 

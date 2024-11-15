@@ -7,7 +7,7 @@ md_path = Path(__file__).parent / "demo.md"
 
 
 async def async_lint_demo() -> LintResult:
-    from shodo.asyncio import lint
+    from shodo.aio import lint
 
     return await lint(md_path.read_text())
 

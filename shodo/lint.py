@@ -104,7 +104,7 @@ def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> Lin
     status = Lint.STATUS_PROCESSING
     messages: List[Message] = []
     updated: datetime = datetime.now()
-    pause = 0.5
+    pause = 0.25
     while status == Lint.STATUS_PROCESSING:
         time.sleep(pause)
         result_res = lint_result(create_res.lint_id, profile)
@@ -113,7 +113,8 @@ def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> Lin
 
         msgs = [Message.load(m) for m in result_res.messages]
         messages = sorted(msgs, key=lambda m: (m.from_.line, m.from_.ch))
-        pause *= 2
+        if pause < 16:
+            pause *= 2
 
     if status == Lint.STATUS_FAILED:
         raise LintFailed

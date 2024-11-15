@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 from shodo.lint import lint
 
@@ -31,7 +31,7 @@ class TestLint:
 
         assert actual.status == "done"
         assert actual.messages == []
-        assert actual.updated == datetime(2023, 11, 15, 7, 13, 20)
+        assert actual.updated.timetuple()[:6] == (2023, 11, 15, 7, 13, 20)
 
         assert len(responses.calls) == 2
         assert json.loads(responses.calls[0].request.body.decode("utf-8")) == {

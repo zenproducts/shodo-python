@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from aioresponses import aioresponses
 
 import pytest
@@ -26,7 +26,7 @@ async def test_lint(credential):
 
         assert actual.status == "done"
         assert actual.messages == []
-        assert actual.updated == datetime(2023, 11, 15, 7, 13, 20)
+        assert actual.updated.timetuple()[:6] == (2023, 11, 15, 7, 13, 20)
         m.assert_called_with(
             "https://api.shodo.ink/@shodo/shodo/lint/",
             "post",

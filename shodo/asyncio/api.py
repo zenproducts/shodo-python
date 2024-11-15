@@ -7,7 +7,7 @@ try:
     import aiohttp
 except ImportError:
     raise ImportError(
-        "Using shodo.async, but the 'aiohttp' package is not installed. "
+        "Using shodo.asyncio, but the 'aiohttp' package is not installed. "
         "Make sure to install the 'async' extra by running 'pip install shodo[async]'"
     )
 

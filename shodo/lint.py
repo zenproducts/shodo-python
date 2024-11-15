@@ -1,7 +1,7 @@
 import time
-from enum import Enum
 from dataclasses import asdict, dataclass
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from shodo.api import lint_create, lint_result
@@ -71,12 +71,12 @@ class LintStatus(Enum):
     DONE = "done"
 
 
-def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> LintResult:
+def lint(body: str, is_html: bool = False, profile: Optional[str] = None, _initial_pause: float=0.25) -> LintResult:
     create_res = lint_create(body, is_html, profile)
 
     status = LintStatus.PROCESSING.value
-    pause = 0.25
-    while status == LintStatus.PROCESSING:
+    pause = _initial_pause
+    while status == LintStatus.PROCESSING.value:
         time.sleep(pause)
         result_res = lint_result(create_res.lint_id, profile)
         status = result_res.status
@@ -86,7 +86,7 @@ def lint(body: str, is_html: bool = False, profile: Optional[str] = None) -> Lin
         if pause < 16:
             pause *= 2
 
-    if status == LintStatus.FAILED:
+    if status == LintStatus.FAILED.value:
         raise LintFailed
 
     return LintResult(status=status, messages=messages, updated=result_res.updated)

@@ -25,8 +25,11 @@ setup(
             "aiohttp",
         ],
         "dev": [
+            "aioresponses",
             "pytest",
+            "pytest-asyncio",
             "pytest-mock",
+            "pytest-responses",
             "mypy",
             "types-requests",
         ],

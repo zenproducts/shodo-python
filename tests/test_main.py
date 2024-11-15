@@ -1,11 +1,11 @@
-import uuid
+from datetime import datetime
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 
 from shodo.conf import UnableLocateCredentialsError
-from shodo.lint import Lint, Message
+from shodo.lint import LintResult, Message
 from shodo.main import cli
 
 
@@ -65,40 +65,42 @@ class TestLogin:
 class TestLint:
     def test_no_profile(self, mocker, runner, filename):
         body = filename.read_text(encoding="utf-8")
-        linting = Lint(body, str(uuid.uuid4()), None)
-        m_lint = mocker.patch("shodo.main.Lint.start", return_value=linting)
-        stub_results = [
-            Message.load(data)
-            for data in [
-                {
-                    "code": "variants:fuzzy",
-                    "message": "表記ゆれがあります",
-                    "severity": "error",
-                    "to": {
-                        "line": 0,
-                        "ch": 12,
+        result = LintResult(
+            "done",
+            [
+                Message.load(data)
+                for data in [
+                    {
+                        "code": "variants:fuzzy",
+                        "message": "表記ゆれがあります",
+                        "severity": "error",
+                        "to": {
+                            "line": 0,
+                            "ch": 12,
+                        },
+                        "index": 2,
+                        "index_to": 12,
+                        "score": 0.8888888888888888,
+                        "before": "Shodo AI校正",
+                        "after": "Shodo AI校正",
+                        "operation": "replace",
+                        "meta": {
+                            "description": "",
+                        },
+                        "from": {
+                            "line": 0,
+                            "ch": 2,
+                        },
                     },
-                    "index": 2,
-                    "index_to": 12,
-                    "score": 0.8888888888888888,
-                    "before": "Shodo AI校正",
-                    "after": "Shodo AI校正",
-                    "operation": "replace",
-                    "meta": {
-                        "description": "",
-                    },
-                    "from": {
-                        "line": 0,
-                        "ch": 2,
-                    },
-                },
-            ]
-        ]
-        mocker.patch.object(Lint, "results", return_value=stub_results)
+                ]
+            ],
+            datetime.now(),
+        )
+        m_lint = mocker.patch("shodo.main.shodo_lint", return_value=result)
 
         actual = runner.invoke(cli, args=["lint", str(filename)], color=True)
 
-        assert actual.exit_code == 0
+        assert actual.exit_code == 1
         assert (
             actual.output
             == "Linting...\n1:3 表記ゆれがあります\n     \x1b[31mShodo AI校正（→ Shodo AI校正）\x1b[0m  飛行機の欠便があ\n"
@@ -109,9 +111,9 @@ class TestLint:
     @pytest.mark.parametrize("profile", ["default", "tests"], ids=["default", "tests"])
     def test_with_profile(self, mocker, runner, filename, profile):
         body = filename.read_text(encoding="utf-8")
-        linting = Lint(body, str(uuid.uuid4()), profile)
-        m_lint = mocker.patch("shodo.main.Lint.start", return_value=linting)
-        mocker.patch.object(Lint, "results", return_value=[])
+        m_lint = mocker.patch(
+            "shodo.main.shodo_lint", return_value=LintResult("done", [], datetime.now())
+        )
 
         actual = runner.invoke(cli, ["lint", str(filename), "--profile", profile])
 
@@ -123,7 +125,7 @@ class TestLint:
     def test_no_existing_default_profile(self, mocker, filename, runner):
         body = filename.read_text(encoding="utf-8")
         m_lint = mocker.patch(
-            "shodo.main.Lint.start",
+            "shodo.main.shodo_lint",
             side_effect=UnableLocateCredentialsError(
                 "Use 'shodo login' to save credentials before running."
             ),
@@ -139,7 +141,7 @@ class TestLint:
     def test_not_found_profile(self, mocker, filename, runner):
         body = filename.read_text(encoding="utf-8")
         m_lint = mocker.patch(
-            "shodo.main.Lint.start",
+            "shodo.main.shodo_lint",
             side_effect=UnableLocateCredentialsError(
                 "The config profile (tests) could not be found."
             ),

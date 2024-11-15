@@ -1,12 +1,19 @@
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional
 
 import requests
 
 from shodo.conf import conf
+
+try:
+    from zoneinfo import ZoneInfo
+    JST = ZoneInfo("Asia/Tokyo")
+except ImportError:
+    from datetime import timedelta, timezone
+    JST = timezone(timedelta(hours=+9), "JST")
 
 
 def api_path(path, profile) -> str:
@@ -37,7 +44,7 @@ class LintResultResponse:
 
     def __post_init__(self) -> None:
         if isinstance(self.updated, int):
-            self.updated = datetime.fromtimestamp(self.updated)
+            self.updated = datetime.fromtimestamp(self.updated, JST)
 
 
 def lint_create(
